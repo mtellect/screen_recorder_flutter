@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.xml.transform.URIResolver;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -43,6 +45,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
 import static java.sql.DriverManager.println;
 
 public class FakeClassPlugin implements FlutterPlugin,MethodChannel.MethodCallHandler, PluginRegistry.ActivityResultListener, PluginRegistry.RequestPermissionsResultListener , ActivityAware {
@@ -246,25 +249,11 @@ public class FakeClassPlugin implements FlutterPlugin,MethodChannel.MethodCallHa
     Uri mUri;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void setOutputPath() {
-
-      /*  File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + "/SC_REC/" + generateFileName() + ".mp4");
-        File f1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "HBRecorder");
-
-       new File("","sc_Rec");
-        if (!file.exists()) {
-            if (file.mkdirs()) {
-                Log.i("Folder ", "created");
-                videoPath=file.toURI().getRawPath();
-                hbRecorder.setOutputPath(videoPath);
-            }
-        }
-
-*/
         String filename = generateFileName();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             resolver = context.getContentResolver();
             contentValues = new ContentValues();
-            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "HBRecorder");
+            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/" + "sc_rec");
             contentValues.put(MediaStore.Video.Media.TITLE, filename);
             contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
@@ -272,11 +261,12 @@ public class FakeClassPlugin implements FlutterPlugin,MethodChannel.MethodCallHa
             //FILE NAME SHOULD BE THE SAME
             hbRecorder.setFileName(filename);
             hbRecorder.setOutputUri(mUri);
-            videoPath="file://"+mUri.getPath();
+            videoPath= FileUtils.getPath(context,mUri);
+            Log.d(TAG, "setOutputPath: "+videoPath);
         }else{
             createFolder();
             String path=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) +"/sc_rec";
-            videoPath="file://"+path;
+            videoPath=new File(path).getAbsolutePath();
             hbRecorder.setOutputPath(path);
         }
     }

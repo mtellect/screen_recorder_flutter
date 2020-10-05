@@ -1,8 +1,8 @@
 name: screen_recorder_flutter
 description: A new Flutter plugin.
 version: 0.0.1
-author:
-homepage:
+author: Maugost Mtellect
+homepage: https://github.com/mtellect/flutter_screen_Recorder
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
